@@ -18,6 +18,7 @@ pub mod resolver {
     use core::ops::Add;
     use ink::env::hash::{HashOutput, Sha2x256};
     use ink::prelude::string::String;
+    use ink::prelude::vec::Vec;
     use ink::storage::Mapping;
 
     #[ink(storage)]
@@ -64,9 +65,9 @@ pub mod resolver {
     )]
     #[derive(Default)]
     pub struct ContentText {
-        github: String,
-        name: String,
-        url: String,
+        social: Vec<String>,
+        general: Vec<String>,
+        address: Vec<String>,
         avatar: String,
         abi: String,
         ipfs: String,
@@ -79,9 +80,9 @@ pub mod resolver {
     )]
     #[derive(Default)]
     pub struct SubDomainContentText {
-        github: String,
-        name: String,
-        url: String,
+        social: Vec<String>,
+        general: Vec<String>,
+        address: Vec<String>,
         avatar: String,
         abi: String,
         ipfs: String,
@@ -91,6 +92,11 @@ pub mod resolver {
     pub struct ContentTextInfo {
         domain_name: String,
         content_text: ContentText,
+    }
+
+    #[ink(event)]
+    pub struct GracePeriod {
+        grace_period: Timestamp,
     }
 
     #[ink(event)]
@@ -186,9 +192,9 @@ pub mod resolver {
                 .get(domain_name.clone())
                 .unwrap_or_default();
             match content_key.as_str() {
-                "github" => texts.github = domain_content_text,
-                "name" => texts.name = domain_content_text,
-                "url" => texts.url = domain_content_text,
+                "social" => texts.social.push(domain_content_text),
+                "general" => texts.general.push(domain_content_text),
+                "address" => texts.address.push(domain_content_text),
                 "avatar" => texts.avatar = domain_content_text,
                 "abi" => texts.abi = domain_content_text,
                 _ => return Err(Error::InvalidContentKey),
@@ -320,14 +326,15 @@ pub mod resolver {
                 .get(sub_domain_name.clone())
                 .unwrap_or_default();
             match content_key.as_str() {
-                "github" => texts.github = sub_domain_content_text,
-                "name" => texts.name = sub_domain_content_text,
-                "url" => texts.url = sub_domain_content_text,
+                "social" => texts.social.push(sub_domain_content_text),
+                "general" => texts.general.push(sub_domain_content_text),
+                "address" => texts.address.push(sub_domain_content_text),
                 "avatar" => texts.avatar = sub_domain_content_text,
                 "abi" => texts.abi = sub_domain_content_text,
                 _ => return Err(Error::InvalidContentKey),
             }
-            self.sub_domain_content_text.insert(sub_domain_name.clone(), &texts);
+            self.sub_domain_content_text
+                .insert(sub_domain_name.clone(), &texts);
 
             self.env().emit_event(SubDomainContentTextInfo {
                 sub_domain_name,
@@ -341,6 +348,9 @@ pub mod resolver {
         pub fn set_grace_period(&mut self, new_grace_period: Timestamp) {
             self.only_admin();
             self.grace_period = new_grace_period;
+            self.env().emit_event(GracePeriod {
+                grace_period: new_grace_period,
+            });
         }
 
         #[ink(message)]

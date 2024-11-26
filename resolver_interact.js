@@ -13,10 +13,12 @@ async function main() {
         refTime: new BN("1000000000000"),
         proofSize: new BN("1000000000000"),
     });
+    
     const storageDepositLimit = null;
 
-    const contractAddress = '0x2a34e222CDa6f9F3Abf874A81D89FE0Da0895307';
+    const contractAddress = '0xb8947BfE949e540eb7eb5e3A885C0f0d61B2CFd1';
     const contract = new ContractPromise(api, json, contractAddress);
+
     console.log('Available contract methods:'.cyan, Object.keys(contract.tx));
 
     const keyring = new Keyring({ type: 'ethereum' });
@@ -43,7 +45,7 @@ async function main() {
         }
     }
 
-    async function read_manager() {
+    async function read_manager() {     
         const { result, gasUsed, output } = await contract.query["readManager"](
             userKeyring.address,
             { gasLimit: gasLimit, storageDepositLimit: null },
@@ -287,27 +289,39 @@ async function main() {
             });
     }
 
+    async function set_grace_period(grace_period) {
+        await contract.tx
+            .setGracePeriod({ storageDepositLimit, gasLimit }, grace_period)
+            .signAndSend(userKeyring, result => {
+                if (result.status.isInBlock) {
+                    console.log(`initialised in block : ${result.status.asInBlock}`.cyan);
+                } else if (result.status.isFinalized) {
+                    console.log(`finalized in block : ${result.status.asFinalized}`.cyan);
+                }
+            });
+    }
+
 
 
     
     // await unregister_domain("akh.vne");
-    // await set_content_hash("akz.vne","https://github.com/arpitantier42/secure_transaction_system");
+    await set_content_hash("akz.vne","https://github.com/arpitantier42/secure_transaction_system");
     // await set_domain_content_text("akz.vne","github", "arpitantier42");
     // await change_manager("0x1bacaecc83ed515b77a8d39f24e46e05c8bbc920");
     // await register_subdomain("akz.vne", "arpit.akz.vne");
-
+    // await set_grace_period(100);
+    
     // await read_owner();
     // await read_manager();
     // await read_grace_period();
     // await read_domain_record("akz.vne");
     // await read_content_hash("akz.vne");
-    await read_content_text("akz.vne");
+    // await read_content_text("akz.vne");
     // await read_domain_owner("akz.vne")
     // await read_domain_expiry_time("akz.vne");
     // await check_domain_availablility("akz.vne");
-   
+    
 }
-
 
 main()
 

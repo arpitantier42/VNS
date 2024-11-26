@@ -3,6 +3,7 @@ import { ApiPromise, WsProvider, Keyring } from '@polkadot/api';
 import { BN, BN_ONE, BN_ZERO } from "@polkadot/util";
 import { json } from "./abi.js";
 import dotenv from "dotenv";
+
 dotenv.config()
 
 const wsProvider = new WsProvider('ws://54.219.1.159:9944');
@@ -18,7 +19,7 @@ const storageDepositLimit = null;
 const keyring = new Keyring({ type: "ethereum" });
 const userKeyring = keyring.addFromUri('0xd615610ab9435f7be2c82e87d6f62c06c75aeb63a2ba6a5cb55260a38ae4cfa4');
 
-const tx = code.tx['new']({ value: 0, gasLimit: gasLimit, storageDepositLimit },userKeyring.address, 120000,60000,120000,"0x2a34e222CDa6f9F3Abf874A81D89FE0Da0895307","0xfF8D6265650Dc95167555f9CaBb09e4bc2436962","0x66a9679FD675B48f878Ad42208da61e93dfDDe98");
+const tx = code.tx['new']({ value: 0, gasLimit: gasLimit, storageDepositLimit },userKeyring.address, 120000,60000,120000,"0xb8947BfE949e540eb7eb5e3A885C0f0d61B2CFd1","0xfF8D6265650Dc95167555f9CaBb09e4bc2436962","0x66a9679FD675B48f878Ad42208da61e93dfDDe98");
 // const tx = code.tx['new']({ value: 0, gasLimit: gasLimit, storageDepositLimit }, userKeyring.address, userKeyring.address, 120000);
 
 const unsub = await tx.signAndSend(userKeyring, { signer: userKeyring }, ({ contract, status, events }) => {

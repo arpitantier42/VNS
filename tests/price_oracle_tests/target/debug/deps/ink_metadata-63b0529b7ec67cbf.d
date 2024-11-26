@@ -1,0 +1,11 @@
+/data/VNS/tests/price_oracle_tests/target/debug/deps/libink_metadata-63b0529b7ec67cbf.rmeta: /home/user/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ink_metadata-5.0.0/src/lib.rs /home/user/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ink_metadata-5.0.0/src/layout/mod.rs /home/user/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ink_metadata-5.0.0/src/layout/validate.rs /home/user/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ink_metadata-5.0.0/src/specs.rs /home/user/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ink_metadata-5.0.0/src/utils.rs
+
+/data/VNS/tests/price_oracle_tests/target/debug/deps/libink_metadata-63b0529b7ec67cbf.rlib: /home/user/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ink_metadata-5.0.0/src/lib.rs /home/user/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ink_metadata-5.0.0/src/layout/mod.rs /home/user/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ink_metadata-5.0.0/src/layout/validate.rs /home/user/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ink_metadata-5.0.0/src/specs.rs /home/user/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ink_metadata-5.0.0/src/utils.rs
+
+/data/VNS/tests/price_oracle_tests/target/debug/deps/ink_metadata-63b0529b7ec67cbf.d: /home/user/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ink_metadata-5.0.0/src/lib.rs /home/user/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ink_metadata-5.0.0/src/layout/mod.rs /home/user/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ink_metadata-5.0.0/src/layout/validate.rs /home/user/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ink_metadata-5.0.0/src/specs.rs /home/user/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ink_metadata-5.0.0/src/utils.rs
+
+/home/user/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ink_metadata-5.0.0/src/lib.rs:
+/home/user/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ink_metadata-5.0.0/src/layout/mod.rs:
+/home/user/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ink_metadata-5.0.0/src/layout/validate.rs:
+/home/user/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ink_metadata-5.0.0/src/specs.rs:
+/home/user/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ink_metadata-5.0.0/src/utils.rs:

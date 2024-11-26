@@ -16,21 +16,21 @@ async function main() {
     
     const storageDepositLimit = null;
 
-    const contractAddress = '0xC3BF4b1BB1eE9c272b31389EfdcD81ad3272aEb5';
+    const contractAddress = '0xfF8D6265650Dc95167555f9CaBb09e4bc2436962';
     const contract = new ContractPromise(api, json, contractAddress);
     console.log('Available contract methods:'.cyan, Object.keys(contract.tx));
 
     const keyring = new Keyring({ type: 'ethereum' });
-    const userKeyring = keyring.addFromUri('    ');
+    const userKeyring = keyring.addFromUri('0xd615610ab9435f7be2c82e87d6f62c06c75aeb63a2ba6a5cb55260a38ae4cfa4');
 
     async function calculate_price(name, duration) {
-        const { result, gasUsed, output } = await contract.query["calculatePrice"](
+        const { result, gasConsumed, output } = await contract.query["calculatePrice"](
             userKeyring.address,
             { gasLimit: gasLimit, storageDepositLimit: null },
             name,
             duration
         );
-
+        console.log(gasConsumed.toHuman(), "gas used");
         if (result.isOk) {
             const calculatedPrice = output.toHuman()
             console.log("calculatedPrice is : ".yellow, calculatedPrice.Ok);
@@ -153,15 +153,15 @@ async function main() {
             });
     }
 
-    // await calculate_price("akt.vne", 300000);
+    await calculate_price("akt.vne", 300000);
     // await read_owner();
-    // await set_price_per_letter(1600);
-    // await set_price_per_year(800);
+    // await set_price_per_letter(20000000000000);
+    // await set_price_per_year(20000000000000);
     // await add_premium_name("antiers.vne");
     // await read_premium_names();
     // await remove_premium_name("antiers.vne");
-    // await get_price_per_year();
-    // await get_price_per_letter();
+    await get_price_per_year();
+    await get_price_per_letter();
 
 }
 

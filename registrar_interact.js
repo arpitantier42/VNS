@@ -6,7 +6,7 @@ import { json } from "./abi.js";
 
 async function main() {
 
-    const wsProvider = new WsProvider('ws://54.219.1.159:9944');
+    const wsProvider = new WsProvider('wss://rpc.pstuff.net');
     const api = await ApiPromise.create({ provider: wsProvider });
 
     const gasLimit = api.registry.createType("WeightV2", {
@@ -15,7 +15,7 @@ async function main() {
     });
     const storageDepositLimit = null;
 
-    const contractAddress = '0x2370bcbC0c5b90AfB12e36Cf1936d45a22c7EDD8';
+    const contractAddress = '0x6beAF9FFDd824F73E5e8b813c59edaC05cADFa43';
     const contract = new ContractPromise(api, json, contractAddress);
     console.log('Available contract methods:'.cyan, Object.keys(contract.tx));
 
@@ -131,7 +131,7 @@ async function main() {
         } else {
             console.error('Failed to read DomainPrice :', output);
             return null;
-        }
+        }   
     }
 
     async function make_commitment(domain_name, domain_owner, duration, secret, resolver) {
@@ -151,20 +151,24 @@ async function main() {
     }
 
     async function commit(commit_hash) {
-        await contract.tx
+        try {
+            await contract.tx
             .commit({ storageDepositLimit, gasLimit }, commit_hash)
             .signAndSend(userKeyring, result => {
                 if (result.status.isInBlock) {
-                    console.log(`initialised in block : ${result.status.asInBlock}`.cyan);
+                    console.log(`Initialised in block : ${result.status.asInBlock}`.cyan);
                 } else if (result.status.isFinalized) {
                     console.log(`finalized in block : ${result.status.asFinalized}`.cyan);
                 }
             });
+        } catch (error) {
+            console.log(error);
+        }
     }
 
     async function register_domain(domain_name, domain_owner, duration, commit_hash, resolver) {
         await contract.tx
-            .register({ value: 7253678335870116692n, storageDepositLimit, gasLimit }, domain_name, domain_owner, duration, commit_hash, resolver)
+            .register({ value: 160253678335870n, storageDepositLimit, gasLimit }, domain_name, domain_owner, duration, commit_hash, resolver)
             .signAndSend(userKeyring, result => {
                 if (result.status.isInBlock) {
                     console.log(`initialised in block : ${result.status.asInBlock}`.cyan);
@@ -185,6 +189,7 @@ async function main() {
                 }
             });
     }
+
     async function mint_nft(domain_name, domain_owner, token_uri) {
         await contract.tx
             .mintNft({ storageDepositLimit, gasLimit }, domain_name, domain_owner, token_uri)
@@ -197,20 +202,19 @@ async function main() {
             });
     }
 
-    // await read_owner();
-    // await read_resolver();
+    await read_owner();
+    await read_resolver();
     await read_current_timestamp();
-    // await read_min_commit_age();
-    // await read_max_commit_age();
-    // await read_min_registration_duration();
-    // await read_domain_price("akb.vne", 400000);
+    await read_min_commit_age();
+    await read_min_registration_duration();
+    await read_domain_price("shiv.vne", 400000); 
 
-    // await make_commitment("akz.vne", userKeyring.address, 400000, "0x01cda9526241efc47b98941546f244a0c9971873278214c59966241d2d667397","0xA62638e3931f800b924d5648A0562532f5b26CF3");
-    // await commit("0x310e481780a48b48626774fbf067eaf48fc5a4f9d527b1551e6c9a6fc6aa2314");
-    await register_domain("akz.vne", userKeyring.address, 400000, "0x01cda9526241efc47b98941546f244a0c9971873278214c59966241d2d667397", "0xA62638e3931f800b924d5648A0562532f5b26CF3"); 
-    // await mint_nft("akz.vne",userKeyring.address,"mint" )
+    // await make_commitment("shiv.vne", userKeyring.address, 400000, "0x01cda9526241efc47b98941546f244a0c9971873278214c59966241d2d667397","0xA62638e3931f800b924d5648A0562532f5b26CF3");
+    // await commit("0x3ea240784a77688dbe3865f814606842739fda75285eb66ac72167ab53ec17ac");
+    // await register_domain("shiv.vne", userKeyring.address, 400000, "0x01cda9526241efc47b98941546f244a0c9971873278214c59966241d2d667397", "0xA62638e3931f800b924d5648A0562532f5b26CF3"); 
+    // await mint_nft("akz.vne",userKeyring.address,"mint");
+
 }
 
 main()
 
-//sub domain

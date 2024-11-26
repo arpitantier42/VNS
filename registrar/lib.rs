@@ -59,7 +59,6 @@ pub mod registrar {
         domain_owner: AccountId,
         domain_expiry_time: Timestamp,
     }
-
     #[derive(Debug, PartialEq, Eq, scale::Encode, scale::Decode)]
     #[cfg_attr(feature = "std", derive(scale_info::TypeInfo))]
     pub enum Error {
@@ -73,15 +72,15 @@ pub mod registrar {
         DomainNotRegistered,
         DomainNotExpired,
     }
-
     #[ink(event)]
     pub struct Register {
         domain_name: String,
-        #[ink(topic)]
         domain_owner: AccountId,
+        registration_fee: Balance,
         duration: Timestamp,
-        secret: [u8; 32],
-        #[ink(topic)]
+        domain_creation_time: Timestamp,
+        domain_expiry_time: Timestamp,
+        domain_grace_period: Timestamp,
         resolver: AccountId,
     }
 
@@ -123,6 +122,7 @@ pub mod registrar {
             if self.commitments.get(commit_hash).is_none() {
                 self.commitments
                     .insert(commit_hash, &self.env().block_timestamp());
+
                 self.env().emit_event(Commit {
                     commit_hash,
                     caller: Self::env().caller(),
@@ -203,8 +203,11 @@ pub mod registrar {
             self.env().emit_event(Register {
                 domain_name,
                 domain_owner,
+                registration_fee: self.env().transferred_value(),
                 duration,
-                secret,
+                domain_creation_time: self.env().block_timestamp(),
+                domain_expiry_time,
+                domain_grace_period: 120000,
                 resolver,
             });
 
@@ -474,7 +477,5 @@ pub mod registrar {
                 .invoke()
         }
     }
-}
 
-//register subdomain function
-// contains domain name
+}

@@ -1,7 +1,7 @@
 #![cfg_attr(not(feature = "std"), no_std, no_main)]
 
 #[ink::contract(env = MyEnvironment)]
-mod erc721 {
+pub mod erc721 {
     #[derive(Clone)]
     pub struct MyEnvironment;
 
@@ -97,7 +97,6 @@ mod erc721 {
         }
 
         /// Returns the balance of the owner.
-        ///
         /// This represents the amount of unique tokens the owner has.
         #[ink(message)]
         pub fn balance_of(&self, owner: AccountId) -> u32 {

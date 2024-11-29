@@ -15,7 +15,7 @@ async function main() {
     });
     const storageDepositLimit = null;
 
-    const contractAddress = '0x6beAF9FFDd824F73E5e8b813c59edaC05cADFa43';
+    const contractAddress = '0xff85B39666294BC59B3d7Fa0d1e8314E1Fbbd16d';
     const contract = new ContractPromise(api, json, contractAddress);
     console.log('Available contract methods:'.cyan, Object.keys(contract.tx));
 
@@ -168,7 +168,7 @@ async function main() {
 
     async function register_domain(domain_name, domain_owner, duration, commit_hash, resolver) {
         await contract.tx
-            .register({ value: 160253678335870n, storageDepositLimit, gasLimit }, domain_name, domain_owner, duration, commit_hash, resolver)
+            .register({ value:  240253678335870n, storageDepositLimit, gasLimit }, domain_name, domain_owner, duration, commit_hash, resolver)
             .signAndSend(userKeyring, result => {
                 if (result.status.isInBlock) {
                     console.log(`initialised in block : ${result.status.asInBlock}`.cyan);
@@ -202,17 +202,16 @@ async function main() {
             });
     }
 
-    await read_owner();
-    await read_resolver();
-    await read_current_timestamp();
-    await read_min_commit_age();
-    await read_min_registration_duration();
-    await read_domain_price("shiv.vne", 400000); 
-
-    // await make_commitment("shiv.vne", userKeyring.address, 400000, "0x01cda9526241efc47b98941546f244a0c9971873278214c59966241d2d667397","0xA62638e3931f800b924d5648A0562532f5b26CF3");
-    // await commit("0x3ea240784a77688dbe3865f814606842739fda75285eb66ac72167ab53ec17ac");
-    // await register_domain("shiv.vne", userKeyring.address, 400000, "0x01cda9526241efc47b98941546f244a0c9971873278214c59966241d2d667397", "0xA62638e3931f800b924d5648A0562532f5b26CF3"); 
-    // await mint_nft("akz.vne",userKeyring.address,"mint");
+    // await read_owner();
+    await mint_nft("whyThis.vne", userKeyring.address, "dsffffffffffff");
+    // await read_resolver();
+    // await read_current_timestamp();
+    // await read_min_commit_age();
+    // await read_min_registration_duration();
+    // await read_domain_price("arpitssk.vne", 400000); 
+    // await make_commitment("arpitssk.vne", userKeyring.address, 400000, "0x01cda9526241efc47b98941546f244a0c9971873278214c59966241d2d667397","0xA62638e3931f800b924d5648A0562532f5b26CF3");
+    // await commit("0x8f7c07641628a6e7cc1871a3e8cff4c282695987807d4241f90c8c8954520b89");
+    // await register_domain("arpitssk.vne", userKeyring.address, 400000, "0x01cda9526241efc47b98941546f244a0c9971873278214c59966241d2d667397", "0xA62638e3931f800b924d5648A0562532f5b26CF3"); 
 
 }
 

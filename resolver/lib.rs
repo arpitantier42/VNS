@@ -215,7 +215,10 @@ pub mod resolver {
         ) -> Result<()> {
             self.only_domain_owner(domain_name.clone());
 
-            let mut texts = self.domain_content_text.get(domain_name.clone()).unwrap();
+            let mut texts = self
+                .domain_content_text
+                .get(domain_name.clone())
+                .unwrap_or_default();
             texts.ipfs = content_hash;
             self.domain_content_text.insert(domain_name.clone(), &texts);
 

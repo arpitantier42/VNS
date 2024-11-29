@@ -16,7 +16,7 @@ async function main() {
     
     const storageDepositLimit = null;
 
-    const contractAddress = '0xb8947BfE949e540eb7eb5e3A885C0f0d61B2CFd1';
+    const contractAddress = '0xf1F0611F204a89c5eBa04232736d137E18b0AE74';
     const contract = new ContractPromise(api, json, contractAddress);
 
     console.log('Available contract methods:'.cyan, Object.keys(contract.tx));
@@ -302,24 +302,23 @@ async function main() {
     }
 
 
-
-    
     // await unregister_domain("akh.vne");
-    await set_content_hash("akz.vne","https://github.com/arpitantier42/secure_transaction_system");
-    // await set_domain_content_text("akz.vne","github", "arpitantier42");
+    // await set_content_hash("hello_Boi12343458989.vne","https://github.com/arpitantier42/secure_transaction_system");
+    // await set_domain_content_text("arpitsss.vne","social","https://github.com/arpitantier42/secure");
     // await change_manager("0x1bacaecc83ed515b77a8d39f24e46e05c8bbc920");
     // await register_subdomain("akz.vne", "arpit.akz.vne");
     // await set_grace_period(100);
-    
+
     // await read_owner();
     // await read_manager();
     // await read_grace_period();
-    // await read_domain_record("akz.vne");
-    // await read_content_hash("akz.vne");
-    // await read_content_text("akz.vne");
-    // await read_domain_owner("akz.vne")
+    // await read_domain_record("google.vne");
+    await read_content_hash("google.vne");
+
+    // await read_content_text("hello_Boi12343458989.vne");
+    // await read_domain_owner("arpitssk.vne")
     // await read_domain_expiry_time("akz.vne");
-    // await check_domain_availablility("akz.vne");
+    // await check_domain_availablility("hello_Boi12343458989.vne");
     
 }
 

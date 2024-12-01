@@ -13,10 +13,10 @@ async function main() {
         refTime: new BN("1000000000000"),
         proofSize: new BN("1000000000000"),
     });
-    
+
     const storageDepositLimit = null;
 
-    const contractAddress = '0xf1F0611F204a89c5eBa04232736d137E18b0AE74';
+    const contractAddress = '0x059c9e7f4b356431E746049dDCc2Dd2F7DC96FeC';
     const contract = new ContractPromise(api, json, contractAddress);
 
     console.log('Available contract methods:'.cyan, Object.keys(contract.tx));
@@ -45,7 +45,7 @@ async function main() {
         }
     }
 
-    async function read_manager() {     
+    async function read_manager() {
         const { result, gasUsed, output } = await contract.query["readManager"](
             userKeyring.address,
             { gasLimit: gasLimit, storageDepositLimit: null },
@@ -218,20 +218,9 @@ async function main() {
             });
     }
 
-    async function set_domain_content_text(domain_name, content_key, content_text) {
+    async function set_domain_content_text(domain_name, content_key, content_key_index, content_text) {
         await contract.tx
-            .setDomainContentText({ storageDepositLimit, gasLimit }, domain_name, content_key, content_text)
-            .signAndSend(userKeyring, result => {
-                if (result.status.isInBlock) {
-                    console.log(`initialised in block : ${result.status.asInBlock}`.cyan);
-                } else if (result.status.isFinalized) {
-                    console.log(`finalized in block : ${result.status.asFinalized}`.cyan);
-                }
-            });
-    }
-    async function set_domain_content_text(domain_name, content_key, content_text) {
-        await contract.tx
-            .setDomainContentText({ storageDepositLimit, gasLimit }, domain_name, content_key, content_text)
+            .setDomainContentText({ storageDepositLimit, gasLimit }, domain_name, content_key, content_key_index, content_text)
             .signAndSend(userKeyring, result => {
                 if (result.status.isInBlock) {
                     console.log(`initialised in block : ${result.status.asInBlock}`.cyan);
@@ -279,7 +268,7 @@ async function main() {
 
     async function register_subdomain(parent_domain, subdomain) {
         await contract.tx
-            .registerSubdomain({ storageDepositLimit, gasLimit }, parent_domain,subdomain)
+            .registerSubdomain({ storageDepositLimit, gasLimit }, parent_domain, subdomain)
             .signAndSend(userKeyring, result => {
                 if (result.status.isInBlock) {
                     console.log(`initialised in block : ${result.status.asInBlock}`.cyan);
@@ -303,8 +292,8 @@ async function main() {
 
 
     // await unregister_domain("akh.vne");
-    // await set_content_hash("hello_Boi12343458989.vne","https://github.com/arpitantier42/secure_transaction_system");
-    // await set_domain_content_text("arpitsss.vne","social","https://github.com/arpitantier42/secure");
+    // await set_content_hash("arpitssk.vne","website");
+    // await set_domain_content_text("arpitssk.vne", "social", 3, "discord");
     // await change_manager("0x1bacaecc83ed515b77a8d39f24e46e05c8bbc920");
     // await register_subdomain("akz.vne", "arpit.akz.vne");
     // await set_grace_period(100);
@@ -312,14 +301,14 @@ async function main() {
     // await read_owner();
     // await read_manager();
     // await read_grace_period();
-    // await read_domain_record("google.vne");
-    await read_content_hash("google.vne");
+    // await read_domain_record("arpitssk.vne");
+    // await read_content_hash("arpitssk.vne");
+    // await read_content_text("arpitssk.vne");
 
-    // await read_content_text("hello_Boi12343458989.vne");
     // await read_domain_owner("arpitssk.vne")
     // await read_domain_expiry_time("akz.vne");
     // await check_domain_availablility("hello_Boi12343458989.vne");
-    
+
 }
 
 main()

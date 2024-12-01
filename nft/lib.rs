@@ -164,7 +164,7 @@ pub mod erc721 {
             caller: AccountId,
             token_uri: String,
         ) -> Result<(), Error> {
-            let domain_availaibiltiy = build_call::<MyEnvironment>()
+            let domain_availaibilty = build_call::<MyEnvironment>()
                 .call(AccountId::from(self.resolver_contract_address))
                 .call_v1()
                 .gas_limit(0)
@@ -178,7 +178,7 @@ pub mod erc721 {
                 .returns::<bool>()
                 .invoke();
 
-            assert!(!domain_availaibiltiy, "domain is not registered");
+            assert!(!domain_availaibilty, "domain is not registered");
 
             self.token_uri.insert(id, &token_uri);
             self.add_token_to(&caller, id)?;

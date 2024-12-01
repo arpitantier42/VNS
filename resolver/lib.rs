@@ -18,6 +18,7 @@ pub mod resolver {
     use core::ops::Add;
     use ink::env::hash::{HashOutput, Sha2x256};
     use ink::prelude::string::String;
+    use ink::prelude::vec;
     use ink::prelude::vec::Vec;
     use ink::storage::Mapping;
 
@@ -68,9 +69,8 @@ pub mod resolver {
         social: Vec<String>,
         general: Vec<String>,
         address: Vec<String>,
-        avatar: String,
-        abi: String,
-        ipfs: String,
+        website: String,
+        other: String,
     }
 
     #[derive(scale::Decode, scale::Encode, Debug, Clone)]
@@ -83,9 +83,8 @@ pub mod resolver {
         social: Vec<String>,
         general: Vec<String>,
         address: Vec<String>,
-        avatar: String,
-        abi: String,
-        ipfs: String,
+        website: String,
+        other: String,
     }
 
     #[ink(event)]
@@ -183,6 +182,7 @@ pub mod resolver {
             &mut self,
             domain_name: String,
             content_key: String,
+            content_key_index: u32,
             domain_content_text: String,
         ) -> Result<()> {
             self.only_domain_owner(domain_name.clone());
@@ -190,13 +190,18 @@ pub mod resolver {
             let mut texts: ContentText = self
                 .domain_content_text
                 .get(domain_name.clone())
-                .unwrap_or_default();
+                .unwrap_or_else(|| ContentText {
+                    social: vec![String::new(); 5],  // Initialize with 5 empty strings
+                    general: vec![String::new(); 5], // Initialize with 5 empty strings
+                    address: vec![String::new(); 5], // Initialize with 5 empty strings
+                    website: String::new(),
+                    other: String::new(),
+                });
             match content_key.as_str() {
-                "social" => texts.social.push(domain_content_text),
-                "general" => texts.general.push(domain_content_text),
-                "address" => texts.address.push(domain_content_text),
-                "avatar" => texts.avatar = domain_content_text,
-                "abi" => texts.abi = domain_content_text,
+                "social" => texts.social[content_key_index as usize] = domain_content_text,
+                "general" => texts.general[content_key_index as usize] = domain_content_text,
+                "address" => texts.address[content_key_index as usize] = domain_content_text,
+                "other" => texts.other = domain_content_text,
                 _ => return Err(Error::InvalidContentKey),
             }
             self.domain_content_text.insert(domain_name.clone(), &texts);
@@ -219,7 +224,7 @@ pub mod resolver {
                 .domain_content_text
                 .get(domain_name.clone())
                 .unwrap_or_default();
-            texts.ipfs = content_hash;
+            texts.website = content_hash;
             self.domain_content_text.insert(domain_name.clone(), &texts);
 
             self.env().emit_event(ContentTextInfo {
@@ -316,10 +321,11 @@ pub mod resolver {
         }
 
         #[ink(message)]
-        pub fn set_sub_domain_content_text(
+        pub fn set_sub_dommain_content_text(
             &mut self,
             sub_domain_name: String,
             content_key: String,
+            content_key_index: u32,
             sub_domain_content_text: String,
         ) -> Result<()> {
             self.only_sub_domain_manager(sub_domain_name.clone());
@@ -327,13 +333,19 @@ pub mod resolver {
             let mut texts = self
                 .sub_domain_content_text
                 .get(sub_domain_name.clone())
-                .unwrap_or_default();
+                .unwrap_or_else(|| SubDomainContentText {
+                    social: vec![String::new(); 5],  // Initialize with 5 empty strings
+                    general: vec![String::new(); 5], // Initialize with 5 empty strings
+                    address: vec![String::new(); 5], // Initialize with 5 empty strings
+                    website: String::new(),
+                    other: String::new(),
+                });
             match content_key.as_str() {
-                "social" => texts.social.push(sub_domain_content_text),
-                "general" => texts.general.push(sub_domain_content_text),
-                "address" => texts.address.push(sub_domain_content_text),
-                "avatar" => texts.avatar = sub_domain_content_text,
-                "abi" => texts.abi = sub_domain_content_text,
+                "social" => texts.social[content_key_index as usize] = sub_domain_content_text,
+                "general" => texts.general[content_key_index as usize] = sub_domain_content_text,
+                "address" => texts.address[content_key_index as usize] = sub_domain_content_text,
+                "wensite" => texts.website = sub_domain_content_text,
+                "other" => texts.other = sub_domain_content_text,
                 _ => return Err(Error::InvalidContentKey),
             }
             self.sub_domain_content_text
@@ -387,7 +399,7 @@ pub mod resolver {
 
         #[ink(message)]
         pub fn read_content_hash(&self, domain_name: String) -> String {
-            self.domain_content_text.get(domain_name).unwrap().ipfs
+            self.domain_content_text.get(domain_name).unwrap().website
         }
 
         #[ink(message)]

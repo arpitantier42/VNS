@@ -14,13 +14,14 @@ pub mod registrar {
         type ChainExtension = ::ink::env::NoChainExtension;
     }
 
-    use core::ops::Add;
-    use ink::env::call::{build_call, ExecutionInput, Selector};
     use ink::prelude::string::String;
     use ink::{
         env::hash::{HashOutput, Sha2x256},
         storage::Mapping,
     };
+    use core::ops::Add;
+    use ink::env::call::{build_call, ExecutionInput, Selector};
+
 
     #[ink(storage)]
     pub struct Registrar {
@@ -88,6 +89,12 @@ pub mod registrar {
     pub struct Commit {
         commit_hash: Hash,
         caller: AccountId,
+    }
+    #[ink(event)]
+    pub struct NftMint {
+        domain_name: String,
+        domain_owner: AccountId,
+        token_uri: String,
     }
 
     pub type Result<T> = core::result::Result<T, Error>;
@@ -207,7 +214,7 @@ pub mod registrar {
                 duration,
                 domain_creation_time: self.env().block_timestamp(),
                 domain_expiry_time,
-                domain_grace_period: 120000,
+                domain_grace_period: self.read_grace_period(),
                 resolver,
             });
 
@@ -244,7 +251,7 @@ pub mod registrar {
         ) -> Result<()> {
             let token_id = self.token_id.add(1);
 
-            build_call::<MyEnvironment>()
+            let _ = build_call::<MyEnvironment>()
                 .call(AccountId::from(self.erc721))
                 .call_v1()
                 .gas_limit(0)
@@ -252,12 +259,19 @@ pub mod registrar {
                 .exec_input(
                     ExecutionInput::new(Selector::new(ink::selector_bytes!("mint")))
                         .push_arg(token_id)
-                        .push_arg(domain_name)
+                        .push_arg(domain_name.clone())
                         .push_arg(domain_owner)
-                        .push_arg(token_uri),
+                        .push_arg(token_uri.clone()),
                 )
                 .returns::<Result<()>>()
-                .invoke()
+                .invoke();
+
+            self.env().emit_event(NftMint {
+                domain_name,
+                domain_owner,
+                token_uri,
+            });
+            Ok(())
         }
 
         #[ink(message)]
@@ -362,6 +376,22 @@ pub mod registrar {
         #[ink(message)]
         pub fn read_min_registration_duration(&self) -> Timestamp {
             self.min_registration_duration
+        }
+
+        #[ink(message)]
+        pub fn read_grace_period(&self) -> Timestamp {
+            build_call::<MyEnvironment>()
+            .call(AccountId::from(self.resolver_contract_address))
+            .call_v1()
+            .gas_limit(0)
+            .transferred_value(0)
+            .exec_input(
+                ExecutionInput::new(Selector::new(ink::selector_bytes!(
+                    "read_grace_period"
+                )))
+            )
+            .returns::<Timestamp>()
+            .invoke()
         }
 
         #[ink(message)]
@@ -477,5 +507,4 @@ pub mod registrar {
                 .invoke()
         }
     }
-
 }

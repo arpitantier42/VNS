@@ -15,7 +15,7 @@ async function main() {
     });
     const storageDepositLimit = null;
 
-    const contractAddress = '0x8c552A954D0bAE353bB22987bd774fA89C1ec4b3';
+    const contractAddress = '0x2eF779AE495c7b60635b73ceD8d429645FBB9Af8';
     const contract = new ContractPromise(api, json, contractAddress);
     console.log('Available contract methods:'.cyan, Object.keys(contract.tx));
 
@@ -218,14 +218,14 @@ async function main() {
     }
 
     // await read_owner();
-    // await mint_nft("arpitssk.vne", userKeyring.address, "ewewew");
+    await mint_nft("arpitssk.vne", userKeyring.address, "nft2");
     await read_resolver();
     // await read_current_timestamp();
-    // await read_grace_period()
+    await read_grace_period();
     // await read_min_commit_age();
     // await read_min_registration_duration();
     await read_domain_price("arpitssk.vne", 400000); 
-    await make_commitment("arpitssk.vne", userKeyring.address, 400000, "0x01cda9526241efc47b98941546f244a0c9971873278214c59966241d2d667397","0xA62638e3931f800b924d5648A0562532f5b26CF3");
+    // await make_commitment("arpitssk.vne", userKeyring.address, 400000, "0x01cda9526241efc47b98941546f244a0c9971873278214c59966241d2d667397","0xA62638e3931f800b924d5648A0562532f5b26CF3");
     // await commit("0x8f7c07641628a6e7cc1871a3e8cff4c282695987807d4241f90c8c8954520b89");
     // await register_domain("arpitssk.vne", userKeyring.address, 400000, "0x01cda9526241efc47b98941546f244a0c9971873278214c59966241d2d667397", "0xA62638e3931f800b924d5648A0562532f5b26CF3"); 
 

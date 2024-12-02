@@ -16,7 +16,7 @@ async function main() {
 
     const storageDepositLimit = null;
 
-    const contractAddress = '0x059c9e7f4b356431E746049dDCc2Dd2F7DC96FeC';
+    const contractAddress = '0x9A1Dd96f081B99E7Df7547D514c32d1dd46B4115';
     const contract = new ContractPromise(api, json, contractAddress);
 
     console.log('Available contract methods:'.cyan, Object.keys(contract.tx));
@@ -293,7 +293,7 @@ async function main() {
 
     // await unregister_domain("akh.vne");
     // await set_content_hash("arpitssk.vne","website");
-    // await set_domain_content_text("arpitssk.vne", "social", 3, "discord");
+    // await set_domain_content_text("arpitssk.vne", "general",2,"website");
     // await change_manager("0x1bacaecc83ed515b77a8d39f24e46e05c8bbc920");
     // await register_subdomain("akz.vne", "arpit.akz.vne");
     // await set_grace_period(100);
@@ -301,9 +301,10 @@ async function main() {
     // await read_owner();
     // await read_manager();
     // await read_grace_period();
-    // await read_domain_record("arpitssk.vne");
-    // await read_content_hash("arpitssk.vne");
-    // await read_content_text("arpitssk.vne");
+    
+    await read_domain_record("arpitssk.vne");
+    await read_content_hash("arpitssk.vne");
+    await read_content_text("arpitssk.vne");
 
     // await read_domain_owner("arpitssk.vne")
     // await read_domain_expiry_time("akz.vne");

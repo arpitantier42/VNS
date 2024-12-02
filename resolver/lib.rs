@@ -191,9 +191,9 @@ pub mod resolver {
                 .domain_content_text
                 .get(domain_name.clone())
                 .unwrap_or_else(|| ContentText {
-                    social: vec![String::new(); 5],  // Initialize with 5 empty strings
-                    general: vec![String::new(); 5], // Initialize with 5 empty strings
-                    address: vec![String::new(); 5], // Initialize with 5 empty strings
+                    social: vec![String::from(""); 5],  
+                    general: vec![String::from(""); 5], 
+                    address: vec![String::from(""); 5], 
                     website: String::new(),
                     other: String::new(),
                 });
@@ -334,9 +334,9 @@ pub mod resolver {
                 .sub_domain_content_text
                 .get(sub_domain_name.clone())
                 .unwrap_or_else(|| SubDomainContentText {
-                    social: vec![String::new(); 5],  // Initialize with 5 empty strings
-                    general: vec![String::new(); 5], // Initialize with 5 empty strings
-                    address: vec![String::new(); 5], // Initialize with 5 empty strings
+                    social: vec![String::from(""); 5],  // Initialize with 5 empty strings
+                    general: vec![String::from(""); 5], // Initialize with 5 empty strings
+                    address: vec![String::from(""); 5], // Initialize with 5 empty strings
                     website: String::new(),
                     other: String::new(),
                 });

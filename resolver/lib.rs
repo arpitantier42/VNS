@@ -118,6 +118,12 @@ pub mod resolver {
         domain_duration: Timestamp,
     }
 
+    #[ink(event)]
+    pub struct SubDomainManager {
+        sub_domain_name: String,
+        sub_domain_manager: AccountId,
+    }
+
     #[derive(Debug, PartialEq, Eq, scale::Encode, scale::Decode)]
     #[cfg_attr(feature = "std", derive(scale_info::TypeInfo))]
     pub enum Error {
@@ -191,9 +197,9 @@ pub mod resolver {
                 .domain_content_text
                 .get(domain_name.clone())
                 .unwrap_or_else(|| ContentText {
-                    social: vec![String::from(""); 5],  
-                    general: vec![String::from(""); 5], 
-                    address: vec![String::from(""); 5], 
+                    social: vec![String::from(""); 5],
+                    general: vec![String::from(""); 5],
+                    address: vec![String::from(""); 5],
                     website: String::new(),
                     other: String::new(),
                 });
@@ -321,7 +327,7 @@ pub mod resolver {
         }
 
         #[ink(message)]
-        pub fn set_sub_dommain_content_text(
+        pub fn set_sub_domain_content_text(
             &mut self,
             sub_domain_name: String,
             content_key: String,
@@ -334,7 +340,7 @@ pub mod resolver {
                 .sub_domain_content_text
                 .get(sub_domain_name.clone())
                 .unwrap_or_else(|| SubDomainContentText {
-                    social: vec![String::from(""); 5],  // Initialize with 5 empty strings
+                    social: vec![String::from(""); 5], // Initialize with 5 empty strings
                     general: vec![String::from(""); 5], // Initialize with 5 empty strings
                     address: vec![String::from(""); 5], // Initialize with 5 empty strings
                     website: String::new(),
@@ -379,7 +385,12 @@ pub mod resolver {
             self.only_domain_owner(parent_domain.clone());
             let sub_domain = self.records.get(parent_domain.clone()).unwrap().sub_domain;
 
-            self.sub_domain_manager.insert(sub_domain, &manager);
+            self.sub_domain_manager.insert(sub_domain.clone(), &manager);
+
+            self.env().emit_event(SubDomainManager {
+                sub_domain_name: sub_domain,
+                sub_domain_manager: self.manager,
+            });
         }
 
         #[ink(message)]

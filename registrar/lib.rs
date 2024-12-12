@@ -86,6 +86,14 @@ pub mod registrar {
     }
 
     #[ink(event)]
+    pub struct SubDomain {
+       parent_domain: String,
+       sub_domain: String,
+       sub_domain_owner: AccountId,
+       sub_domain_manager: AccountId
+    }
+
+    #[ink(event)]
     pub struct Commit {
         commit_hash: Hash,
         caller: AccountId,
@@ -207,7 +215,7 @@ pub mod registrar {
                 )
                 .unwrap();
 
-            self.env().emit_event(Register {
+            self.env().emit_event(Register{
                 domain_name,
                 domain_owner,
                 registration_fee: self.env().transferred_value(),
@@ -222,7 +230,7 @@ pub mod registrar {
         }
 
         #[ink(message)]
-        pub fn register_subdomian(
+        pub fn register_subdomain(
             &mut self,
             parent_domain: String,
             sub_domain: String,
@@ -234,11 +242,18 @@ pub mod registrar {
                 .transferred_value(0)
                 .exec_input(
                     ExecutionInput::new(Selector::new(ink::selector_bytes!("register_subdomain")))
-                        .push_arg(parent_domain)
-                        .push_arg(sub_domain),
+                        .push_arg(parent_domain.clone())
+                        .push_arg(sub_domain.clone()),
                 )
                 .returns::<bool>()
                 .invoke();
+            self.env().emit_event(SubDomain{
+                parent_domain,
+                sub_domain,
+                sub_domain_owner : Self::env().caller(),
+                sub_domain_manager : Self::env().caller()
+
+            });
             Ok(())
         }
 

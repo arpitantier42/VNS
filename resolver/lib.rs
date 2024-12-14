@@ -26,8 +26,8 @@ pub mod resolver {
     pub struct Record {
         records: Mapping<String, Records>,
         domain_content_text: Mapping<String, ContentText>,
-        sub_domain_content_text: Mapping<String, SubDomainContentText>,
-        sub_domain_manager: Mapping<String, AccountId>,
+        subdomain_content_text: Mapping<String, SubDomainContentText>,
+        subdomain_manager: Mapping<String, AccountId>,
         admin: AccountId,
         manager: AccountId,
         grace_period: Timestamp,
@@ -45,7 +45,7 @@ pub mod resolver {
         secret: [u8; 32],
         resolver: AccountId,
         domain_expiry_time: Timestamp,
-        sub_domain: String,
+        subdomain: String,
     }
 
     #[derive(scale::Decode, scale::Encode, Debug, Clone)]
@@ -70,7 +70,7 @@ pub mod resolver {
         general: Vec<String>,
         address: Vec<String>,
         website: String,
-        other: String,
+        other: Vec<String>,
     }
 
     #[derive(scale::Decode, scale::Encode, Debug, Clone)]
@@ -84,7 +84,7 @@ pub mod resolver {
         general: Vec<String>,
         address: Vec<String>,
         website: String,
-        other: String,
+        other: Vec<String>,
     }
 
     #[ink(event)]
@@ -100,8 +100,8 @@ pub mod resolver {
 
     #[ink(event)]
     pub struct SubDomainContentTextInfo {
-        sub_domain_name: String,
-        sub_domain_content_text: SubDomainContentText,
+        subdomain_name: String,
+        subdomain_content_text: SubDomainContentText,
     }
 
     #[ink(event)]
@@ -117,11 +117,16 @@ pub mod resolver {
         domain_expiry_time: Timestamp,
         domain_duration: Timestamp,
     }
+    #[ink(event)]
+    pub struct UnregisteredDomainInfo {
+        domain_name: String,
+        registration_status: bool,
+    }
 
     #[ink(event)]
     pub struct SubDomainManager {
-        sub_domain_name: String,
-        sub_domain_manager: AccountId,
+        subdomain_name: String,
+        subdomain_manager: AccountId,
     }
 
     #[derive(Debug, PartialEq, Eq, scale::Encode, scale::Decode)]
@@ -142,8 +147,8 @@ pub mod resolver {
             Self {
                 records: Mapping::default(),
                 domain_content_text: Mapping::default(),
-                sub_domain_content_text: Mapping::default(),
-                sub_domain_manager: Mapping::default(),
+                subdomain_content_text: Mapping::default(),
+                subdomain_manager: Mapping::default(),
                 admin,
                 manager,
                 grace_period,
@@ -201,13 +206,13 @@ pub mod resolver {
                     general: vec![String::from(""); 5],
                     address: vec![String::from(""); 5],
                     website: String::new(),
-                    other: String::new(),
+                    other: vec![String::from(""); 2],
                 });
             match content_key.as_str() {
                 "social" => texts.social[content_key_index as usize] = domain_content_text,
                 "general" => texts.general[content_key_index as usize] = domain_content_text,
                 "address" => texts.address[content_key_index as usize] = domain_content_text,
-                "other" => texts.other = domain_content_text,
+                "other" => texts.other[content_key_index as usize] = domain_content_text,
                 _ => return Err(Error::InvalidContentKey),
             }
             self.domain_content_text.insert(domain_name.clone(), &texts);
@@ -228,8 +233,15 @@ pub mod resolver {
 
             let mut texts = self
                 .domain_content_text
-                .get(domain_name.clone())
-                .unwrap_or_default();
+                .get(&domain_name)
+                .unwrap_or_else(|| ContentText {
+                    social: vec![String::from(""); 5],
+                    general: vec![String::from(""); 5],
+                    address: vec![String::from(""); 5],
+                    website: String::new(),
+                    other: vec![String::from(""); 2],
+                });
+
             texts.website = content_hash;
             self.domain_content_text.insert(domain_name.clone(), &texts);
 
@@ -277,6 +289,11 @@ pub mod resolver {
                 self.records.remove(domain_name.clone());
                 self.domain_content_text.remove(domain_name.clone());
 
+                self.env().emit_event(UnregisteredDomainInfo {
+                    domain_name,
+                    registration_status: false,
+                });
+
                 Ok(())
             }
         }
@@ -286,9 +303,7 @@ pub mod resolver {
             let domain_expiry_time = self.read_domain_expiry_time(domain_name.clone());
             self.only_domain_owner(domain_name.clone());
 
-            if self.env().block_timestamp() < domain_expiry_time
-                && self.env().block_timestamp() > domain_expiry_time.add(self.grace_period)
-            {
+            if self.env().block_timestamp() > domain_expiry_time.add(self.grace_period) {
                 Err(Error::RenewTimeExpired)
             } else {
                 let mut record_info = self.records.get(domain_name.clone()).unwrap();
@@ -306,60 +321,51 @@ pub mod resolver {
         }
 
         #[ink(message)]
-        pub fn register_subdomain(&mut self, parent_domain: String, sub_domain: String) -> bool {
-            self.only_domain_owner(parent_domain.clone());
+        pub fn register_subdomain(&mut self, parent_domain: String, subdomain: String) -> bool {
             let mut parent_domain_records = self.records.get(parent_domain.clone()).unwrap();
-            parent_domain_records.sub_domain = sub_domain.clone();
-            self.records.insert(parent_domain, &parent_domain_records);
-            self.sub_domain_manager
-                .insert(sub_domain, &Self::env().caller());
+            parent_domain_records.subdomain = subdomain.clone();
+            self.records
+                .insert(parent_domain.clone(), &parent_domain_records);
+            self.subdomain_manager
+                .insert(subdomain, &self.read_domain_owner(parent_domain));
 
             true
         }
 
         #[ink(message)]
-        pub fn unregister_subdomain(&mut self, parent_domain: String) -> Result<()> {
-            self.only_domain_owner(parent_domain.clone());
-            let mut parent_records = self.records.get(parent_domain.clone()).unwrap();
-            parent_records.sub_domain = String::from("");
-            self.records.insert(parent_domain.clone(), &parent_records);
-            Ok(())
-        }
-
-        #[ink(message)]
-        pub fn set_sub_domain_content_text(
+        pub fn set_subdomain_content_text(
             &mut self,
-            sub_domain_name: String,
+            subdomain_name: String,
             content_key: String,
             content_key_index: u32,
-            sub_domain_content_text: String,
+            subdomain_content_text: String,
         ) -> Result<()> {
-            self.only_sub_domain_manager(sub_domain_name.clone());
+            self.only_subdomain_manager(subdomain_name.clone());
 
             let mut texts = self
-                .sub_domain_content_text
-                .get(sub_domain_name.clone())
+                .subdomain_content_text
+                .get(subdomain_name.clone())
                 .unwrap_or_else(|| SubDomainContentText {
-                    social: vec![String::from(""); 5], // Initialize with 5 empty strings
-                    general: vec![String::from(""); 5], // Initialize with 5 empty strings
-                    address: vec![String::from(""); 5], // Initialize with 5 empty strings
+                    social: vec![String::from(""); 5],
+                    general: vec![String::from(""); 5],
+                    address: vec![String::from(""); 5],
                     website: String::new(),
-                    other: String::new(),
+                    other: vec![String::from(""); 2],
                 });
             match content_key.as_str() {
-                "social" => texts.social[content_key_index as usize] = sub_domain_content_text,
-                "general" => texts.general[content_key_index as usize] = sub_domain_content_text,
-                "address" => texts.address[content_key_index as usize] = sub_domain_content_text,
-                "wensite" => texts.website = sub_domain_content_text,
-                "other" => texts.other = sub_domain_content_text,
+                "social" => texts.social[content_key_index as usize] = subdomain_content_text,
+                "general" => texts.general[content_key_index as usize] = subdomain_content_text,
+                "address" => texts.address[content_key_index as usize] = subdomain_content_text,
+                "website" => texts.website = subdomain_content_text,
+                "other" => texts.other[content_key_index as usize] = subdomain_content_text,
                 _ => return Err(Error::InvalidContentKey),
             }
-            self.sub_domain_content_text
-                .insert(sub_domain_name.clone(), &texts);
+            self.subdomain_content_text
+                .insert(subdomain_name.clone(), &texts);
 
             self.env().emit_event(SubDomainContentTextInfo {
-                sub_domain_name,
-                sub_domain_content_text: texts.clone(),
+                subdomain_name,
+                subdomain_content_text: texts.clone(),
             });
 
             Ok(())
@@ -381,15 +387,15 @@ pub mod resolver {
         }
 
         #[ink(message)]
-        pub fn change_sub_domain_manager(&mut self, parent_domain: String, manager: AccountId) {
+        pub fn change_subdomain_manager(&mut self, parent_domain: String, manager: AccountId) {
             self.only_domain_owner(parent_domain.clone());
-            let sub_domain = self.records.get(parent_domain.clone()).unwrap().sub_domain;
+            let subdomain = self.records.get(parent_domain.clone()).unwrap().subdomain;
 
-            self.sub_domain_manager.insert(sub_domain.clone(), &manager);
+            self.subdomain_manager.insert(subdomain.clone(), &manager);
 
             self.env().emit_event(SubDomainManager {
-                sub_domain_name: sub_domain,
-                sub_domain_manager: self.manager,
+                subdomain_name: subdomain,
+                subdomain_manager: self.manager,
             });
         }
 
@@ -404,8 +410,8 @@ pub mod resolver {
         }
 
         #[ink(message)]
-        pub fn read_subdomain_content_text(&self, sub_domian_name: String) -> SubDomainContentText {
-            self.sub_domain_content_text.get(sub_domian_name).unwrap()
+        pub fn read_subdomain_content_text(&self, subdomain_name: String) -> SubDomainContentText {
+            self.subdomain_content_text.get(subdomain_name).unwrap()
         }
 
         #[ink(message)]
@@ -425,14 +431,14 @@ pub mod resolver {
         }
 
         #[ink(message)]
-        pub fn read_sub_domain_owner(&self, parent_domain: String) -> AccountId {
+        pub fn read_subdomain_owner(&self, parent_domain: String) -> AccountId {
             let owner_record = self.records.get(parent_domain).unwrap();
             owner_record.domain_owner
         }
 
         #[ink(message)]
-        pub fn read_sub_domain_manager(&self, sub_domain: String) -> AccountId {
-            self.sub_domain_manager.get(sub_domain.clone()).unwrap()
+        pub fn read_subdomain_manager(&self, subdomain: String) -> AccountId {
+            self.subdomain_manager.get(subdomain.clone()).unwrap()
         }
 
         #[ink(message)]
@@ -473,7 +479,7 @@ pub mod resolver {
                 secret,
                 resolver,
                 domain_expiry_time,
-                sub_domain: String::from(""),
+                subdomain: String::from(""),
             }
         }
 
@@ -508,11 +514,11 @@ pub mod resolver {
                 "must be domain owner!"
             );
         }
-        fn only_sub_domain_manager(&self, sub_domain: String) {
+        fn only_subdomain_manager(&self, subdomain: String) {
             let caller = Self::env().caller();
             assert_eq!(
                 caller,
-                self.read_sub_domain_manager(sub_domain),
+                self.read_subdomain_manager(subdomain),
                 "must be sub domain manager!"
             );
         }

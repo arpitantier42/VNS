@@ -16,7 +16,7 @@ async function main() {
 
     const storageDepositLimit = null;
 
-    const contractAddress = '0x5625345F504B2681A0e5982601E6D27a47583a22';
+    const contractAddress = '0xf81A1E84d04C8278a6db4dBd655B96e184C2f3a2';
     const contract = new ContractPromise(api, json, contractAddress);
 
     console.log('Available contract methods:'.cyan, Object.keys(contract.tx));
@@ -61,6 +61,22 @@ async function main() {
         }
     }
 
+    async function readSubdomainManager(domain) {
+        const { result, gasUsed, output } = await contract.query["readSubdomainManager"](
+            userKeyring.address,
+            { gasLimit: gasLimit, storageDepositLimit: null },domain
+        );
+
+        if (result.isOk) {
+            const Manager = output.toHuman()
+            console.log("Manager address is : ".yellow, Manager.Ok);
+            return Manager;
+        } else {
+            console.error('Failed to read Manager address:', output);
+            return null;
+        }
+    }
+    
     async function read_domain_manager(domain_name) {
         const { result, gasUsed, output } = await contract.query["readDomainManager"](
             userKeyring.address,
@@ -229,7 +245,18 @@ async function main() {
                 }
             });
     }
-
+    
+    async function set_subdomain_content_text(domain_name, content_key, content_key_index, content_text) {
+        await contract.tx
+            .setSubdomainContentText({ storageDepositLimit, gasLimit }, domain_name, content_key, content_key_index, content_text)
+            .signAndSend(userKeyring, result => {
+                if (result.status.isInBlock) {
+                    console.log(`initialised in block : ${result.status.asInBlock}`.cyan);
+                } else if (result.status.isFinalized) {
+                    console.log(`finalized in block : ${result.status.asFinalized}`.cyan);
+                }
+            });
+    }
     async function set_domain_manager(domain_name) {
         await contract.tx
             .setDomainManager({ storageDepositLimit, gasLimit }, domain_name)
@@ -290,26 +317,38 @@ async function main() {
             });
     }
 
+    async function renew(domain_name, duration) {
+        await contract.tx
+            .renewDomain({ storageDepositLimit, gasLimit }, domain_name, duration)
+            .signAndSend(userKeyring, result => {
+                if (result.status.isInBlock) {
+                    console.log(`initialised in block : ${result.status.asInBlock}`.cyan);
+                } else if (result.status.isFinalized) {
+                    console.log(`finalized in block : ${result.status.asFinalized}`.cyan);
+                }
+            });
+    }
 
-    // await unregister_domain("akh.vne");
-    // await set_content_hash("arpitssk.vne","website");
-    // await set_domain_content_text("arpitssk.vne", "general",2,"website2");
+
+    // await unregister_domain("arpitssp.vne");
+    // await set_content_hash("arpitssp.vne","website1");
+    // await set_domain_content_text("arpitssp.vne","other",0,"arpit1");
+    // await set_subdomain_content_text("ak.arpitssp.vne","website",1,"dsfsfs")
     // await change_manager("0x1bacaecc83ed515b77a8d39f24e46e05c8bbc920");
-    // await register_subdomain("akz.vne", "arpit.akz.vne");
     // await set_grace_period(100);
+    // await renew("arpitssp.vne", 180000)
 
-    await read_owner();
+    // await read_owner();
     // await read_manager();
     // await read_grace_period();
-
-    // await read_domain_record("sdsfds.vne");
-    // await read_content_hash("arpitssk.vne");
-    // await read_content_text("arpitssk.vne");
-
-    // await read_domain_owner("arpitssk.vne")
+    // await read_domain_record("arpitssp.vne");
+    // await read_content_hash("arpitssp.vne");
+    // await read_content_text("arpitssp.vne");
+    // await read_domain_owner("arpitssp.vne")
     // await read_domain_expiry_time("akz.vne");
-    // await check_domain_availablility("hello_Boi12343458989.vne");
-
+    // await check_domain_availablility("arpitssp.vne");
+    // await read_subdomain_content_text("ak.arpitssp.vne")
+    // await readSubdomainManager("ak.arpitssp.vne")
 }
 
 main()

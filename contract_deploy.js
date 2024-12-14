@@ -19,9 +19,9 @@ const storageDepositLimit = null;
 const keyring = new Keyring({ type: "ethereum" });
 const userKeyring = keyring.addFromUri('0xd615610ab9435f7be2c82e87d6f62c06c75aeb63a2ba6a5cb55260a38ae4cfa4');
 
-// const tx = code.tx['new']({ value: 0, gasLimit: gasLimit, storageDepositLimit }, userKeyring.address, 120000, 60000, 120000, "0x5625345F504B2681A0e5982601E6D27a47583a22", "0xfF8D6265650Dc95167555f9CaBb09e4bc2436962", "0x085D1dC0a921b6fb4065e474deC7085A303DeEAa"); //registrar cotractn
+const tx = code.tx['new']({ value: 0, gasLimit: gasLimit, storageDepositLimit }, userKeyring.address, 120000, 60000, 120000, "0xf81A1E84d04C8278a6db4dBd655B96e184C2f3a2", "0xfF8D6265650Dc95167555f9CaBb09e4bc2436962", "0xBBCf1A1ED38F03Fde91EB182C39f0063ab6c8dA1"); //registrar cotractn
 // const tx = code.tx['new']({ value: 0, gasLimit: gasLimit, storageDepositLimit }, userKeyring.address, userKeyring.address, 120000); // resolver contract
-// const tx = code.tx['new']({ value: 0, gasLimit: gasLimit, storageDepositLimit }, "0x5625345F504B2681A0e5982601E6D27a47583a22"); // nft contract
+// const tx = code.tx['new']({ value: 0, gasLimit: gasLimit, storageDepositLimit }, "0xf81A1E84d04C8278a6db4dBd655B96e184C2f3a2"); // nft contract
 
 const unsub = await tx.signAndSend(userKeyring, { signer: userKeyring }, ({ contract, status, events }) => {
     console.log('status', status.toHuman())

@@ -247,7 +247,7 @@ pub mod registrar {
                 )
                 .returns::<bool>()
                 .invoke();
-            self.env().emit_event(SubDomain{
+            self.env().emit_event(SubDomain {
                 parent_domain,
                 sub_domain,
                 sub_domain_owner : Self::env().caller(),

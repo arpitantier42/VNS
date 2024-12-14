@@ -13,9 +13,8 @@ async function main() {
         refTime: new BN("1000000000000"),
         proofSize: new BN("1000000000000"),
     });
-    
-    const storageDepositLimit = null;
 
+    const storageDepositLimit = null;
     const contractAddress = '0xfF8D6265650Dc95167555f9CaBb09e4bc2436962';
     const contract = new ContractPromise(api, json, contractAddress);
     console.log('Available contract methods:'.cyan, Object.keys(contract.tx));
@@ -31,6 +30,7 @@ async function main() {
             duration
         );
         console.log(gasConsumed.toHuman(), "gas used");
+
         if (result.isOk) {
             const calculatedPrice = output.toHuman()
             console.log("calculatedPrice is : ".yellow, calculatedPrice.Ok);

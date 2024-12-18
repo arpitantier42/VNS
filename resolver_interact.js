@@ -336,16 +336,17 @@ async function main() {
     // await set_subdomain_content_text("ak.arpitssp.vne","website",1,"dsfsfs")
     // await change_manager("0x1bacaecc83ed515b77a8d39f24e46e05c8bbc920");
     // await set_grace_period(100);
-    // await renew("arpitssp.vne", 180000)
-
+    // await renew("arpitssp.vne", 180000);
     // await read_owner();
     // await read_manager();
     // await read_grace_period();
-    // await read_domain_record("arpitssp.vne");
-    // await read_content_hash("arpitssp.vne");
-    // await read_content_text("arpitssp.vne");
-    // await read_domain_owner("arpitssp.vne")
-    // await read_domain_expiry_time("akz.vne");
+
+    
+    await read_domain_record("arpitssp.vne");
+    await read_content_hash("arpitssp.vne");
+    await read_content_text("arpitssp.vne");
+    await read_domain_owner("arpitssp.vne");
+    await read_domain_expiry_time("arpitssp.vne");
     // await check_domain_availablility("arpitssp.vne");
     // await read_subdomain_content_text("ak.arpitssp.vne")
     // await readSubdomainManager("ak.arpitssp.vne")
